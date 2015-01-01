@@ -5,6 +5,7 @@ Fields
 * X-coordinate
 * Y-coordinate
 * Z-coordinate
+
 ===============
 Methods
 ===============
