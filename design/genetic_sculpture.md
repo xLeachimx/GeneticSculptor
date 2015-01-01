@@ -15,7 +15,7 @@ Fields
 Methods
 ===============
 * mate
-  * input - Another Voxel
+  * input - Another GeneticSculpture
   * output - Two GeneticSculptures
   * description - "mates" two sculptures and produces two mixed offspring
 * toSCAD
@@ -26,3 +26,7 @@ Methods
   * input - None
   * output - None
   * description - "mutates" organism through random replacement of a voxel with a random new voxel
+* dominant
+  * input - Another GeneticSculpture
+  * output - Boolean Value
+  * description - Returns true iff each metric is even with or better than the given GeneticSculpture
