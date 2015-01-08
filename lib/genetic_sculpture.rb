@@ -57,6 +57,11 @@ class GeneticSculpture
 	end
 
 	def dominant comp
+		if @metrics[:spread] <= other.metrics[:spread] and @metrics[:spaceUse] >= other.metrics[:spaceUse] and
+														   @metrics[:duplicates] <= other.metrics[:duplicates]
+			return @metrics[:spread] < other.metrics[:spread] or @metrics[:spaceUse]  > other.metrics[:spaceUse] or
+														   		 @metrics[:duplicates] < other.metrics[:duplicates]
+		end
 	end
 
 	def toScad
