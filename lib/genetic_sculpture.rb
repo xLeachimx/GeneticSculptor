@@ -1,7 +1,6 @@
 require_relative 'voxel'
 
 default_metrics = {
-	volume: 0,
 	spaceUse: 0,
 	spread: 0,
 	duplicate: 0,
@@ -53,7 +52,6 @@ class GeneticSculpture
 
 	def evalMetrics
 		@metrics[:spread] = spread
-		@metrics[:volume] = height() * width() * depth()
 		@metrics[:spaceUse] = spaceUse
 		@metrics[:duplicate] = duplicates
 	end
@@ -79,12 +77,31 @@ class GeneticSculpture
 	end
 
 	def spread
+		middleX = minMaxX[1] - minMaxX[0]
+		middleY = minMaxY[1] - minMaxY[0]
+		middleZ = minMaxZ[1] - minMaxZ[0]
+		internalBox = BoundingBox.new(middleX, middleY, middleZ, width, height, depth)
+		count = 0
+		for v in @voxels
+			count += 1 if internalBox.inside?(v)
+		end
+		return count/(@size-count)
 	end
 
 	def spaceUse
+		volume = height() * width() * depth()
+		return @size/volume
 	end
 
 	def duplicates
+		count = 0
+		for v in @voxels
+			for v2 in @voxels
+				count += 1 if v.same?(v2)
+			end
+		end
+		count -= @size
+		return count
 	end
 
 	# Methods for helping to calculate metrics
