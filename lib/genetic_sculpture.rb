@@ -56,7 +56,15 @@ class GeneticSculpture
 		@metrics[:duplicate] = duplicates
 	end
 
-	def compareMetrics comp
+	def dominant comp
+	end
+
+	def toScad
+		file = ""
+		for v in @voxels
+			file += v.toScad() + "\n"
+		end
+		return file
 	end
 
 	private
