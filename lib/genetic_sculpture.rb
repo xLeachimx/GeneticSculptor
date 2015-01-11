@@ -27,6 +27,7 @@ class GeneticSculpture < GeneticObject
 			@voxels[i] = Voxel.new(x,y,z)
 		end
 		@metrics = default_metrics;
+		@metrics_calculated = false
 	end
 
 	def mutate
@@ -57,10 +58,12 @@ class GeneticSculpture < GeneticObject
 	end
 
 	def evalMetrics
+		return if metrics_calculated
 		@metrics[:spread] = spread
 		@metrics[:spaceUse] = spaceUse
 		@metrics[:duplicate] = duplicates
 		@metrics[:phi] = phiRating
+		metrics_calculated = true
 	end
 
 	def dominant compare
