@@ -109,14 +109,27 @@ class GeneticSculpture < GeneticObject
 	end
 
 	def spread
-		middleX = minMaxX[1] - minMaxX[0]
-		middleY = minMaxY[1] - minMaxY[0]
-		middleZ = minMaxZ[1] - minMaxZ[0]
-		internalBox = BoundingBox.new(middleX, middleY, middleZ, width, height, depth)
-		count = 0
-		for v in @voxels
-			count += 1 if internalBox.inside?(v)
+		radius = 0
+		if height() >= width() && height >= depth()
+			radius = height
+		elsif width() >= height() && width() >= depth()
+			radius = width
+		else
+			radius = depth
 		end
+
+		radius = radius/2
+
+		centerX = minMaxX[1] - minMaxX[0]
+		centerY = minMaxY[1] - minMaxY[0]
+		centerZ = minMaxZ[1] - minMaxZ[0]
+
+		count = 0
+
+		for v in voxel
+			count += 1 if distance(centerX, centerY, centerZ, v) < radius 
+		end
+
 		return count/(@size-count)
 	end
 
@@ -190,5 +203,12 @@ class GeneticSculpture < GeneticObject
 			end
 		end
 		return [lowest,highest]
+	end
+
+	def distance x y z voxel
+		dx = (x-voxel.x)**2 
+		dy = (y-voxel.y)**2
+		dz = (z-voxel.z)**2
+		return Math.sqrt(dx+dy+dz)
 	end
 end
