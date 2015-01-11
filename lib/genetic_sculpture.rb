@@ -21,12 +21,12 @@ class GeneticSculpture < GeneticObject
 		rGen = Random.new
 		@voxels = Array.new(@size)
 		for i in 0...@size
-			x = rGen.rand(128) + rGen.rand
-			y = rGen.rand(128) + rGen.rand
-			z = rGen.rand(128) + rGen.rand
+			x = rGen.rand(10) + rGen.rand
+			y = rGen.rand(10) + rGen.rand
+			z = rGen.rand(10) + rGen.rand
 			@voxels[i] = Voxel.new(x,y,z)
 		end
-		@metrics = default_metrics;
+		@metrics = default_metrics
 		@metrics_calculated = false
 	end
 
@@ -58,29 +58,31 @@ class GeneticSculpture < GeneticObject
 	end
 
 	def evalMetrics
-		return if metrics_calculated
+		return if @metrics_calculated
 		@metrics[:spread] = spread
 		@metrics[:spaceUse] = spaceUse
 		@metrics[:duplicate] = duplicates
 		@metrics[:phi] = phiRating
-		metrics_calculated = true
+		@metrics_calculated = true
 	end
 
 	def dominant compare
 		if @metrics[:spread] <= compare.metrics[:spread] && @metrics[:spaceUse] >= compare.metrics[:spaceUse] &&
 														    @metrics[:duplicate] <= compare.metrics[:duplicate] &&
 														    @metrics[:phi] <= compare.metrics[:phi]
-			return @metrics[:spread] < compare.metrics[:spread] || @metrics[:spaceUse]  > compare.metrics[:spaceUse] ||
-														   		   @metrics[:duplicate] < compare.metrics[:duplicate] ||
-														   		   @metrics[:phi] < compare.metrics[:phi]
-
+			if @metrics[:spread] < compare.metrics[:spread] || @metrics[:spaceUse]  > compare.metrics[:spaceUse] ||
+														   	   @metrics[:duplicate] < compare.metrics[:duplicate] ||
+														   	   @metrics[:phi] < compare.metrics[:phi]
+				return 1
+			else
+				return 0
+			end
 		end
-		return false
+		return -1
 	end
 
 	def comp compare
-		return 1 if dominant(compare)
-		return -1
+		dominant(compare)
 	end
 
 	def toScad
@@ -126,11 +128,12 @@ class GeneticSculpture < GeneticObject
 
 		count = 0
 
-		for v in voxel
+		for v in @voxels
 			count += 1 if distance(centerX, centerY, centerZ, v) < radius 
 		end
 
-		return count/(@size-count)
+		val = count-(@size/2)
+		return val.abs
 	end
 
 	def spaceUse
@@ -155,7 +158,8 @@ class GeneticSculpture < GeneticObject
 		hw = height()/width()
 		dw = depth()/width()
 		hd = height()/depth()
-		return (hw + dw + hd) - (3 * phi)
+		val = (hw + dw + hd) - (3 * phi)
+		return val.abs
 	end
 
 	# Methods for helping to calculate metrics
@@ -205,7 +209,7 @@ class GeneticSculpture < GeneticObject
 		return [lowest,highest]
 	end
 
-	def distance x y z voxel
+	def distance x, y, z, voxel
 		dx = (x-voxel.x)**2 
 		dy = (y-voxel.y)**2
 		dz = (z-voxel.z)**2
