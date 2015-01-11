@@ -11,19 +11,19 @@ class Voxel
 	end
 
 	def same? other
-		return other.x == @x and other.y == @y and other.z == z
+		return other.x == @x && other.y == @y && other.z == z
 	end
 
-	def toSCAD
-		return 'translate([' + @x + ',' + @y + ',' + @z + '])' + 'sphere(1)' 
+	def toScad
+		return 'translate([' + @x.to_s + ',' + @y.to_s + ',' + @z.to_s + '])' + 'sphere(1);' 
 	end
 
 	def cross other
 		which = Array.new(3)
 		rGen = Random.new
-		which[0] = (rGen.rand() > .5)
-		which[1] = (rGen.rand() > .5)
-		which[2] = (rGen.rand() > .5)
+		which[0] = (rGen.rand() > 0.5)
+		which[1] = (rGen.rand() > 0.5)
+		which[2] = (rGen.rand() > 0.5)
 		one = other
 		two = self
 		if which[0]

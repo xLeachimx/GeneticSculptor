@@ -1,0 +1,10 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    gemetics (0.1.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  gemetics

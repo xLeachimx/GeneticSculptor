@@ -1,19 +1,24 @@
 require_relative 'voxel'
+require_relative 'bounding_box'
+require 'genetic_object'
 
-default_metrics = {
-	spaceUse: 0,
-	spread: 0,
-	duplicate: 0,
-}
+def default_metrics
+	return {
+		spaceUse: 0,
+		spread: 0,
+		duplicate: 0,
+	}
+end
 
-class GeneticSculpture
+class GeneticSculpture < GeneticObject
 	attr_accessor :voxels
 	attr_accessor :size
 	attr_accessor :metrics
 
 	def initialize size
+		@size = size
 		rGen = Random.new
-		voxels = Array.new(@size)
+		@voxels = Array.new(@size)
 		for i in 0...@size
 			x = rGen.rand(128) + rGen.rand
 			y = rGen.rand(128) + rGen.rand
@@ -56,12 +61,18 @@ class GeneticSculpture
 		@metrics[:duplicate] = duplicates
 	end
 
-	def dominant comp
-		if @metrics[:spread] <= other.metrics[:spread] and @metrics[:spaceUse] >= other.metrics[:spaceUse] and
-														   @metrics[:duplicates] <= other.metrics[:duplicates]
-			return @metrics[:spread] < other.metrics[:spread] or @metrics[:spaceUse]  > other.metrics[:spaceUse] or
-														   		 @metrics[:duplicates] < other.metrics[:duplicates]
+	def dominant compare
+		if @metrics[:spread] <= compare.metrics[:spread] && @metrics[:spaceUse] >= compare.metrics[:spaceUse] &&
+														   @metrics[:duplicate] <= compare.metrics[:duplicate]
+			return @metrics[:spread] < compare.metrics[:spread] || @metrics[:spaceUse]  > compare.metrics[:spaceUse] ||
+														   		 @metrics[:duplicate] < compare.metrics[:duplicate]
 		end
+		return false
+	end
+
+	def comp compare
+		return 1 if dominant(compare)
+		return -1
 	end
 
 	def toScad

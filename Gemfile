@@ -1,3 +1,3 @@
 source 'https://rubygems.org'
 
-gem 'gemetics' ~> '0.1.0'
+gem 'gemetics'
