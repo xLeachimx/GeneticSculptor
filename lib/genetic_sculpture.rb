@@ -7,6 +7,7 @@ def default_metrics
 		spaceUse: 0,
 		spread: 0,
 		duplicate: 0,
+		phi: 0,
 	}
 end
 
@@ -59,13 +60,17 @@ class GeneticSculpture < GeneticObject
 		@metrics[:spread] = spread
 		@metrics[:spaceUse] = spaceUse
 		@metrics[:duplicate] = duplicates
+		@metrics[:phi] = phiRating
 	end
 
 	def dominant compare
 		if @metrics[:spread] <= compare.metrics[:spread] && @metrics[:spaceUse] >= compare.metrics[:spaceUse] &&
-														   @metrics[:duplicate] <= compare.metrics[:duplicate]
+														    @metrics[:duplicate] <= compare.metrics[:duplicate] &&
+														    @metrics[:phi] <= compare.metrics[:phi]
 			return @metrics[:spread] < compare.metrics[:spread] || @metrics[:spaceUse]  > compare.metrics[:spaceUse] ||
-														   		 @metrics[:duplicate] < compare.metrics[:duplicate]
+														   		   @metrics[:duplicate] < compare.metrics[:duplicate] ||
+														   		   @metrics[:phi] < compare.metrics[:phi]
+
 		end
 		return false
 	end
@@ -126,6 +131,15 @@ class GeneticSculpture < GeneticObject
 		end
 		count -= @size
 		return count
+	end
+
+	# Tests the bounding box for the presence of phi
+	def phiRating
+		phi = 1.61803398875
+		hw = height()/width()
+		dw = depth()/width()
+		hd = height()/depth()
+		return (hw + dw + hd) - (3 * phi)
 	end
 
 	# Methods for helping to calculate metrics
