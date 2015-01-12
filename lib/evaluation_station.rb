@@ -8,7 +8,7 @@ def evaluatePopulation population
 	population = population.sort{|x,y| x.comp(y)}
 	size = population.size
 	for i in 0...population.size
-		population[i].fitness = 1.5 ** (size - i)
+		population[i].fitness = (1.0+(1.0/size)) ** (size - i)
 	end
 
 	return population
