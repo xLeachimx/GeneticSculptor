@@ -20,14 +20,14 @@ def writeSculptureToFile sculpture
 	f.close
 end
 
-pop = Array.new(1000)
-for i in 0...1000
+pop = Array.new(10000)
+for i in 0...10000
 	pop[i] = GeneticSculpture.new(1000)
 end
 
 options = default_GA_options
 options[:debug] = true
-options[:genMax] = 10000
+options[:genMax] = 1000
 options[:totalPopReplace] = false
 
-writeSculptureToFile runGeneticAlgorithm(pop, method( :evaluatePopulation ), 1.5**1001, options)
+writeSculptureToFile runGeneticAlgorithm(pop, method( :evaluatePopulation ), 1.5**10002, options)

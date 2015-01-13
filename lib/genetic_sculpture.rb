@@ -21,9 +21,9 @@ class GeneticSculpture < GeneticObject
 		rGen = Random.new
 		@voxels = Array.new(@size)
 		for i in 0...@size
-			x = rGen.rand(12) + rGen.rand
-			y = rGen.rand(12) + rGen.rand
-			z = rGen.rand(12) + rGen.rand
+			x = rGen.rand(100)
+			y = rGen.rand(100)
+			z = rGen.rand(100)
 			@voxels[i] = Voxel.new(x,y,z)
 		end
 		@metrics = default_metrics
@@ -33,9 +33,9 @@ class GeneticSculpture < GeneticObject
 	def mutate
 		rGen = Random.new
 		changePoint = rGen.rand(@size)
-		x = rGen.rand(12) + rGen.rand
-		y = rGen.rand(12) + rGen.rand
-		z = rGen.rand(12) + rGen.rand
+		x = rGen.rand(100)
+		y = rGen.rand(100)
+		z = rGen.rand(100)
 		@voxels[changePoint] = Voxel.new(x,y,z)
 	end
 
