@@ -5,9 +5,10 @@ def evaluatePopulation population
 	for p in population
 		p.evalMetrics
 	end
-	population = population.sort{|x,y| x.metrics[:spread] <=> y.metrics[:spread]}
+	population = population.sort{|x,y| x.comp(y)}
+	size = population.size
 	for i in 0...population.size
-		population[i].fitness = population.size - (i+1)
+		population[i].fitness = (1.0+(1.0/size)) ** (size - i)
 	end
 
 	return population
@@ -19,13 +20,14 @@ def writeSculptureToFile sculpture
 	f.close
 end
 
-pop = Array.new(1000)
-for i in 0...1000
-	pop[i] = GeneticSculpture.new(100)
+pop = Array.new(10000)
+for i in 0...10000
+	pop[i] = GeneticSculpture.new(1000)
 end
 
 options = default_GA_options
 options[:debug] = true
-options[:genMax] = 10
+options[:genMax] = 1000
+options[:totalPopReplace] = false
 
-writeSculptureToFile runGeneticAlgorithm(pop, method( :evaluatePopulation ), 100000, options)
+writeSculptureToFile runGeneticAlgorithm(pop, method( :evaluatePopulation ), 1.5**10002, options)

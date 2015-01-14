@@ -15,7 +15,7 @@ class Voxel
 	end
 
 	def toScad
-		return 'translate([' + @x.to_s + ',' + @y.to_s + ',' + @z.to_s + '])' + 'sphere(1);' 
+		return 'translate([' + @x.to_s + ',' + @y.to_s + ',' + @z.to_s + '])' + 'cube(1);' 
 	end
 
 	def cross other

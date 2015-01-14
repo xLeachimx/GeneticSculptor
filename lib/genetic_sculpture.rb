@@ -7,6 +7,7 @@ def default_metrics
 		spaceUse: 0,
 		spread: 0,
 		duplicate: 0,
+		phi: 0,
 	}
 end
 
@@ -20,20 +21,21 @@ class GeneticSculpture < GeneticObject
 		rGen = Random.new
 		@voxels = Array.new(@size)
 		for i in 0...@size
-			x = rGen.rand(128) + rGen.rand
-			y = rGen.rand(128) + rGen.rand
-			z = rGen.rand(128) + rGen.rand
+			x = rGen.rand(100)
+			y = rGen.rand(100)
+			z = rGen.rand(100)
 			@voxels[i] = Voxel.new(x,y,z)
 		end
-		@metrics = default_metrics;
+		@metrics = default_metrics
+		@metrics_calculated = false
 	end
 
 	def mutate
 		rGen = Random.new
 		changePoint = rGen.rand(@size)
-		x = rGen.rand(128) + rGen.rand
-		y = rGen.rand(128) + rGen.rand
-		z = rGen.rand(128) + rGen.rand
+		x = rGen.rand(100)
+		y = rGen.rand(100)
+		z = rGen.rand(100)
 		@voxels[changePoint] = Voxel.new(x,y,z)
 	end
 
@@ -56,23 +58,31 @@ class GeneticSculpture < GeneticObject
 	end
 
 	def evalMetrics
+		return if @metrics_calculated
 		@metrics[:spread] = spread
 		@metrics[:spaceUse] = spaceUse
 		@metrics[:duplicate] = duplicates
+		@metrics[:phi] = phiRating
+		@metrics_calculated = true
 	end
 
 	def dominant compare
 		if @metrics[:spread] <= compare.metrics[:spread] && @metrics[:spaceUse] >= compare.metrics[:spaceUse] &&
-														   @metrics[:duplicate] <= compare.metrics[:duplicate]
-			return @metrics[:spread] < compare.metrics[:spread] || @metrics[:spaceUse]  > compare.metrics[:spaceUse] ||
-														   		 @metrics[:duplicate] < compare.metrics[:duplicate]
+														    @metrics[:duplicate] <= compare.metrics[:duplicate] &&
+														    @metrics[:phi] <= compare.metrics[:phi]
+			if @metrics[:spread] < compare.metrics[:spread] || @metrics[:spaceUse]  > compare.metrics[:spaceUse] ||
+														   	   @metrics[:duplicate] < compare.metrics[:duplicate] ||
+														   	   @metrics[:phi] < compare.metrics[:phi]
+				return 1
+			else
+				return 0
+			end
 		end
-		return false
+		return -1
 	end
 
 	def comp compare
-		return 1 if dominant(compare)
-		return -1
+		dominant(compare)
 	end
 
 	def toScad
@@ -101,15 +111,29 @@ class GeneticSculpture < GeneticObject
 	end
 
 	def spread
-		middleX = minMaxX[1] - minMaxX[0]
-		middleY = minMaxY[1] - minMaxY[0]
-		middleZ = minMaxZ[1] - minMaxZ[0]
-		internalBox = BoundingBox.new(middleX, middleY, middleZ, width, height, depth)
-		count = 0
-		for v in @voxels
-			count += 1 if internalBox.inside?(v)
+		radius = 0
+		if height() >= width() && height >= depth()
+			radius = height
+		elsif width() >= height() && width() >= depth()
+			radius = width
+		else
+			radius = depth
 		end
-		return count/(@size-count)
+
+		radius = radius/2
+
+		centerX = minMaxX[1] - minMaxX[0]
+		centerY = minMaxY[1] - minMaxY[0]
+		centerZ = minMaxZ[1] - minMaxZ[0]
+
+		count = 0
+
+		for v in @voxels
+			count += 1 if distance(centerX, centerY, centerZ, v) < radius 
+		end
+
+		val = count-(@size/2)
+		return val.abs
 	end
 
 	def spaceUse
@@ -126,6 +150,16 @@ class GeneticSculpture < GeneticObject
 		end
 		count -= @size
 		return count
+	end
+
+	# Tests the bounding box for the presence of phi
+	def phiRating
+		phi = 1.61803398875
+		hw = height()/width()
+		dw = depth()/width()
+		hd = height()/depth()
+		val = (hw + dw + hd) - (3 * phi)
+		return val.abs
 	end
 
 	# Methods for helping to calculate metrics
@@ -173,5 +207,12 @@ class GeneticSculpture < GeneticObject
 			end
 		end
 		return [lowest,highest]
+	end
+
+	def distance x, y, z, voxel
+		dx = (x-voxel.x)**2 
+		dy = (y-voxel.y)**2
+		dz = (z-voxel.z)**2
+		return Math.sqrt(dx+dy+dz)
 	end
 end
