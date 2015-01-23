@@ -2,42 +2,59 @@ class Voxel
 	attr_accessor :x
 	attr_accessor :y
 	attr_accessor :z
+	attr_accessor :shape
+	attr_accessor :height
+	attr_accessor :width
+	attr_accessor :depth
 
 
-	def initialize x, y, z
+	def initialize x, y, z, shape, height, width, depth
 		@x = x
 		@y = y
 		@z = z
+		@shape = shape
+		@height = height
+		@width = width
+		@depth = depth
 	end
 
 	def same? other
-		return other.x == @x && other.y == @y && other.z == z
+		fields = {
+			x: @x,
+			y: @y,
+			z: @z,
+			shape: @shape,
+			height: @height,
+			width: @width,
+			depth: @depth
+		}
+
+		otherFields = {
+			x: other.x,
+			y: other.y,
+			z: other.z,
+			shape: other.shape,
+			height: other.height,
+			width: other.width,
+			depth: other.depth
+		}
+		return fields == otherFields
 	end
 
 	def toScad
-		return 'translate([' + @x.to_s + ',' + @y.to_s + ',' + @z.to_s + '])' + 'cube(1);' 
+		base = 'translate([' + @x.to_s + ',' + @y.to_s + ',' + @z.to_s + '])'
+		if @shape == 'cube'
+			return base + 'cube(' + width + depth + height + ', center=true);'
+		elsif @shape == 'cylinder'
+			radius = (@width+@depth)/2
+			return base + 'cylinder(' + 'h=' + @height + ',' + 'r= ' + radius + ',' +', center=true);'
+		elsif @shape == 'sphere'
+			radius = (@width + @height + @depth)
+			return base + 'sphere(' + radius + ', center=true);'
+		end
+		return '//Problem with translation'
 	end
 
-	def cross other
-		which = Array.new(3)
-		rGen = Random.new
-		which[0] = (rGen.rand() > 0.5)
-		which[1] = (rGen.rand() > 0.5)
-		which[2] = (rGen.rand() > 0.5)
-		one = other
-		two = self
-		if which[0]
-			one.x = self.x
-			two.x = other.x
-		end
-		if which[1]
-			one.y = self.y
-			two.y = other.y
-		end
-		if which[2]
-			one.z = self.z
-			two.z = other.z
-		end
-		return [one, two]
+	def volume
 	end
 end

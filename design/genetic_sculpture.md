@@ -6,10 +6,9 @@ Fields
 * Fitness
 * Class variable for number of voxels
 * Hash of metrics
-  * # of Duplications
-  * Bounding Box Volume
-  * Spread
-  * y-axis symmetry
+  * volume use >
+  * Spread <
+  * phi <
 
 ===============
 Methods
@@ -26,7 +25,7 @@ Methods
   * input - None
   * output - None
   * description - "mutates" organism through random replacement of a voxel with a random new voxel
-* dominant
+* comp
   * input - Another GeneticSculpture
   * output - Boolean Value
   * description - Returns true iff each metric is even with or better than the given GeneticSculpture

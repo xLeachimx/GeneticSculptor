@@ -5,6 +5,10 @@ Fields
 * X-coordinate
 * Y-coordinate
 * Z-coordinate
+* shapeName
+* height-z
+* width-x
+* depth-y
 
 ===============
 Methods
@@ -17,7 +21,8 @@ Methods
   * input - None
   * output - A string which is a valid line of OpenScad code
   * description - Allows conversion of voxel for using in an OpenScad script
-* cross
-  * input - Another Voxel
-  * output - Two Voxels
-  * description - "mates" two voxels and produces two mixed offspring
+
+* volume
+  * input - None
+  * output - The volume of the solid
+  * description - Returns the volume of the voxel
