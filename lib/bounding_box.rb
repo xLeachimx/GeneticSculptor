@@ -1,5 +1,3 @@
-require_relative 'voxel'
-
 class BoundingBox
 	attr_accessor :x
 	attr_accessor :y
@@ -17,22 +15,28 @@ class BoundingBox
 		@depth = depth
 	end
 
-	def inside? voxel
-		return insideRange?(minMax(@x,@width), voxel.x) &&
-			   insideRange?(minMax(@z,@depth), voxel.z) &&
-			   insideRange?(minMax(@y,@height), voxel.y)
+	def intersect? bb
+		return true if rangeIntersect?(minMax(@x,@width),minMax(bb.x,bb.width)) &&
+					   rangeIntersect?(minMax(@y,@depth),minMax(bb.y,bb.depth)) &&
+					   rangeIntersect?(minMax(@z,@height),minMax(bb.z,bb.height))
+		return false
 	end
-
 
 	private
 
 	def minMax origin, dimension
-		min = origin - (dimension/2)
-		max = origin + (dimension/2)
+		min = origin - (dimension/2.0)
+		max = origin + (dimension/2.0)
 		return [min,max]
 	end
 
 	def insideRange? range, location
-		return (location < range[0] || location > range[1])
+		return (location >= range[0] && location <= range[1])
+	end
+
+	def rangeIntersect? r1, r2
+		return true if r2[0] < r1[0] && r2[1] >= r1[0]	
+		return true if r2[0] >= r1[0] && r2[0] <= r1[1]
+		return false
 	end
 end

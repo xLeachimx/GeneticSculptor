@@ -7,6 +7,7 @@ def default_metrics
 		spaceUse: 0,
 		spread: 0,
 		phi: 0,
+		groups: 0,
 	}
 end
 
@@ -18,6 +19,7 @@ class GeneticSculpture < GeneticObject
 	def initialize size, limit
 		@size = size
 		@limit = limit
+		ratio = ((@limit**3)/(@size**3))/10.0
 		rGen = Random.new
 		@voxels = Array.new(@size)
 		for i in 0...@size
@@ -25,9 +27,9 @@ class GeneticSculpture < GeneticObject
 			y = rGen.rand(@limit)
 			z = rGen.rand(@limit)
 			shape = ['cube', 'cylinder', 'sphere'].sample
-			height = rGen.rand(@limit/100.0)
-			width = rGen.rand(@limit/100.0)
-			depth = rGen.rand(@limit/100.0)
+			height = rGen.rand(ratio)
+			width = rGen.rand(ratio)
+			depth = rGen.rand(ratio)
 			@voxels[i] = Voxel.new(x,y,z,shape,height,width,depth)
 		end
 		@metrics = default_metrics
@@ -35,15 +37,16 @@ class GeneticSculpture < GeneticObject
 	end
 
 	def mutate
+		ratio = ((@limit**3)/(@size**3))/10.0
 		rGen = Random.new
 		changePoint = rGen.rand(@size)
 		x = rGen.rand(@limit)
 		y = rGen.rand(@limit)
 		z = rGen.rand(@limit)
 		shape = ['cube', 'cylinder', 'sphere'].sample
-		height = rGen.rand(@limit/100.0)
-		width = rGen.rand(@limit/100.0)
-		depth = rGen.rand(@limit/100.0)
+		height = rGen.rand(ratio)
+		width = rGen.rand(ratio)
+		depth = rGen.rand(ratio)
 		@voxels[changePoint] = Voxel.new(x,y,z,shape,height,width,depth)
 	end
 
@@ -72,13 +75,14 @@ class GeneticSculpture < GeneticObject
 		@metrics[:spread] = spread
 		@metrics[:spaceUse] = spaceUse
 		@metrics[:phi] = phiRating
+		@metrics[:groups] = groups
 		@metrics_calculated = true
 	end
 
 	def comp compare
-		compMetr = compare.metrics
-		if @metrics[:spread] <= compMet[:spread] && @metrics[:phi] <= compMet[:phi] && @metrics[:spaceUse] >= compMet[:spaceUse]
-			if @metrics[:spread] < compMet[:spread] && @metrics[:phi] < compMet[:phi] && @metrics[:spaceUse] > compMet[:spaceUse]
+		compMet = compare.metrics
+		if @metrics[:spread] <= compMet[:spread] && @metrics[:phi] <= compMet[:phi] && @metrics[:groups] <= compMet[:groups]
+			if @metrics[:spread] < compMet[:spread] || @metrics[:phi] < compMet[:phi] || @metrics[:groups] < compMet[:groups]
 				return 1
 			end
 			return 0
@@ -138,6 +142,7 @@ class GeneticSculpture < GeneticObject
 	end
 
 	def spaceUse
+		volume = 0
 		for v in @voxels
 			volume += v.volume
 		end
@@ -161,7 +166,7 @@ class GeneticSculpture < GeneticObject
 		lowest = @voxels[0].x + @voxels[0].width
 		for v in @voxels
 			if highest < v.x + v.width
-				highest = v.x + w.width
+				highest = v.x + v.width
 			end
 
 			if lowest > v.x - v.width
@@ -206,5 +211,32 @@ class GeneticSculpture < GeneticObject
 		dy = (y-voxel.y)**2
 		dz = (z-voxel.z)**2
 		return Math.sqrt(dx+dy+dz)
+	end
+
+	def groups
+		used = Array.new
+		stack = Array.new
+		numGroups = 0
+		while used.length < @voxels.length
+			numGroups += 1
+			for i in 0...@voxels.length
+				if !used.include?(i)
+					stack.push(i)
+					break
+				end
+			end
+			while stack.length() != 0
+				current = stack.pop
+				for i in 0...@voxels.length
+					if current != i && @voxels[i].intersect?(@voxels[current])
+						if !used.include?(i)
+							stack.push(i)
+							used.push(i)
+						end
+					end
+				end
+			end
+		end
+		return numGroups
 	end
 end

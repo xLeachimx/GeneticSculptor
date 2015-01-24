@@ -2,7 +2,10 @@ require_relative 'genetic_sculpture'
 require 'gemetics'
 
 def evaluatePopulation population
+	count = 0
 	for p in population
+		count += 1
+		puts count
 		p.evalMetrics
 	end
 	population = population.sort{|x,y| x.comp(y)}
@@ -27,8 +30,8 @@ end
 
 options = default_GA_options
 options[:debug] = true
-options[:genMax] = 10000
+options[:genMax] = 1000
 options[:totalPopReplace] = false
-options[:mutationPercent] = 0.1
+options[:mutationPercent] = 0.05
 
 writeSculptureToFile runGeneticAlgorithm(pop, method( :evaluatePopulation ), 1005, options)

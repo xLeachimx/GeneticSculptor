@@ -1,3 +1,5 @@
+require_relative 'bounding_box'
+
 class Voxel
 	attr_accessor :x
 	attr_accessor :y
@@ -44,17 +46,44 @@ class Voxel
 	def toScad
 		base = 'translate([' + @x.to_s + ',' + @y.to_s + ',' + @z.to_s + '])'
 		if @shape == 'cube'
-			return base + 'cube(' + width + depth + height + ', center=true);'
+			return base + 'cube(' + @width.to_s + ',' + @depth.to_s + ',' + @height.to_s + ', center=true);'
 		elsif @shape == 'cylinder'
-			radius = (@width+@depth)/2
-			return base + 'cylinder(' + 'h=' + @height + ',' + 'r= ' + radius + ',' +', center=true);'
+			radius = (@width+@depth)/2.0
+			return base + 'cylinder(' + 'h=' + @height.to_s + ',' + 'd= ' + radius.to_s + ', center=true);'
 		elsif @shape == 'sphere'
-			radius = (@width + @height + @depth)
-			return base + 'sphere(' + radius + ', center=true);'
+			radius = (@width + @height + @depth)/3.0
+			return base + 'sphere(d=' + radius.to_s + ', center=true);'
 		end
 		return '//Problem with translation'
 	end
 
 	def volume
+		if @shape == 'cube'
+			return @width*@height*@depth
+		elsif @shape == 'cylinder'
+			radius = (@width+@depth)/2.0
+			return @height*Math::PI*((radius/2)**2)
+		elsif @shape == 'sphere'
+			radius = (@width+@depth+@height)/3.0
+			return (4.0/3.0)*Math::PI*((radius/2)**3)
+		end
+		return -1
+	end
+
+	def intersect? other
+		return boundingBox().intersect?(other.boundingBox())
+	end
+
+	def boundingBox
+		if @shape == 'cube'
+			return BoundingBox.new(@x,@y,@z,@width,@height,@depth)
+		elsif @shape == 'cylinder'
+			radius = (@width+@depth)/2.0
+			return BoundingBox.new(@x,@y,@z,radius,@height,radius)
+		elsif @shape == 'sphere'
+			radius = (@width + @height + @depth)/3.0
+			return BoundingBox.new(@x,@y,@z,radius,radius,radius)
+		end
+		return nil
 	end
 end

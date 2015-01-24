@@ -26,3 +26,13 @@ Methods
   * input - None
   * output - The volume of the solid
   * description - Returns the volume of the voxel
+
+* intersect?
+  * input - Another voxel
+  * output- A boolean value
+  * description - Returns true if the two voxels intersect
+
+* boundingBox
+  * input - None
+  * output - returns the shapes bounding box
+  * description - Returns the bounding box of the shape
